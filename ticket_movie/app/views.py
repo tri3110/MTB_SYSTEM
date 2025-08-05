@@ -153,7 +153,7 @@ class SeatsScreen(APIView):
                         ELSE FALSE
                     END AS is_booking
                 FROM public.seats s
-                WHERE s.screen_id = %s
+                WHERE s.screen_id = %s AND is_active = true
             ) s
             ORDER BY s.row, s.number
         """, [showtime_id, screen_id])

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ticket_movie.models import Cinema, City, Movie, Screen, Showtime
+from ticket_movie.models import Cinema, City, Movie, Screen, Seat, Showtime
 from datetime import date, datetime
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -81,6 +81,14 @@ class CinemaSerializer(serializers.ModelSerializer):
         return value
     
 class ScreenSerializer(serializers.ModelSerializer):
+    
+    cinema = CinemaSerializer(read_only=True)
+    cinema_id = serializers.PrimaryKeyRelatedField(
+        queryset=Cinema.objects.all(),
+        write_only=True,
+        source='cinema'
+    )
+    
     class Meta:
         model = Screen
         fields = '__all__'
@@ -89,7 +97,6 @@ class ScreenSerializer(serializers.ModelSerializer):
             'type': {'required': True},
             'capacity': {'required': True}
         }
-    
     
     def validate_type(self, value):
         if len(value) > 20:
@@ -132,3 +139,14 @@ class ShowtimeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid date format. Use ISO format: YYYY-MM-DDTHH:MM:SS±HH:MM")
         
         return data
+    
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
+        fields = [
+            'id',
+            'row',
+            'number',
+            'type',
+            'is_active',
+        ]
